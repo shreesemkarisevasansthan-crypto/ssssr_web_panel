@@ -151,7 +151,7 @@ const AddAgent = () => {
 
               <div style="text-align: center;">
                 <a href="#" class="button">
-                  Login to Your Account in Shavliya Seva App
+                  Login to Your Account in Shree Semkari Seva App
                 </a>
               </div>
 
@@ -188,7 +188,7 @@ IMPORTANT SECURITY NOTICE:
 - Do not share your password with anyone
 - Keep this email secure or delete it after noting down your credentials
 
-Login at: Shavliya Seva App
+Login at: Shree Semkari Seva App
 
 If you have any questions, please contact our support team.
 
