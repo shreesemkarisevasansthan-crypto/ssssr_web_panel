@@ -25,6 +25,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setSelectedProgram } from '@/redux/slices/commonSlice';
 import AddMember from '../screen/programs/members/AddMember';
 import AddPaymentModal from '../common/addPayment/AddPaymentModal';
+import LanguageSwitcher from './LanguageSwitcher';
 const { Option } = Select;
 
 const TopBar = ({ 
@@ -239,9 +240,10 @@ const getNamepage =()=>{
           <AddPaymentModal/>
           <AddAgent/>
           
-          <AddProgram /> 
+          {/* <AddProgram />  */}
+          <LanguageSwitcher/>
             <AddMember/>
-          <RequestSection />
+          <RequestSection /> 
           {/* <Tooltip title="Messages">
             <button className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600 hover:text-primary-blue">
               <FiMail size={20} />

@@ -6,7 +6,8 @@ import CustomDashboardLayout from "@/components/base/Layout";
 import { AuthProvider } from "@/lib/AuthProvider";
 import Providers from "@/components/base/providers";
 import StoreProvider from "../../StoreProvider";
-
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages } from 'next-intl/server';
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -33,23 +34,30 @@ export const metadata = {
   description: "A comprehensive trust management solution",
 };
 
-export default function RootLayout({ children }) {
+export default async  function RootLayout({ children,params}) {
+    const { locale } = await params;
+    console.log(locale,"locale")
+  const messages = await getMessages();
   return (
-    <html lang="en">
+    <html lang={locale}>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+           <NextIntlClientProvider locale={locale} messages={messages}>
         <AuthProvider>
           <StoreProvider>
           <ConfigProvider theme={theme}>
             <App>
                 <Providers>
               <CustomDashboardLayout>
-                {children}
+          \
+
+                {children}.
               </CustomDashboardLayout>
                 </Providers>
             </App>
           </ConfigProvider>
           </StoreProvider>
         </AuthProvider>
+           </NextIntlClientProvider>
       </body>
     </html>
   );

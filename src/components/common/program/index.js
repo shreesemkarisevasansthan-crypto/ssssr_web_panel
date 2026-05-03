@@ -14,6 +14,7 @@ const AddProgram = () => {
   const [form] = Form.useForm();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   
   const locationGroupTypes = [
     { label: 'Group A', value: 'A' },
@@ -64,6 +65,11 @@ const AddProgram = () => {
         hiname: values.hiname,
         about: values.about,
         ...categoryFlags,
+        // Add other category name fields if category is "Other"
+        ...(values.category === 'isOther' && {
+          otherCategoryName: values.otherCategoryName,
+          otherCategoryHindiName: values.otherCategoryHindiName,
+        }),
         ageGroups: ageGroupsWithId,
         locationGroups: locationGroupsWithId,
         createdAt: new Date(),
@@ -73,6 +79,7 @@ const AddProgram = () => {
       message.success('Program created successfully!');
       setIsDrawerOpen(false);
       form.resetFields();
+      setSelectedCategory(null);
     } catch (error) {
       console.error("Error adding program:", error);
       message.error("Failed to create program.");
@@ -247,7 +254,11 @@ const AddProgram = () => {
           </div>
         }
         placement="right"
-        onClose={() => setIsDrawerOpen(false)}
+        onClose={() => {
+          setIsDrawerOpen(false);
+          form.resetFields();
+          setSelectedCategory(null);
+        }}
         open={isDrawerOpen}
         width={600}
         className="custom-drawer"
@@ -286,7 +297,7 @@ const AddProgram = () => {
                     className="h-10"
                   />
                 </Form.Item>
-     <Form.Item
+                <Form.Item
                   label="Certificate Note (Hindi)"
                   name="noteLine"
                   rules={[{ required: true, message: 'Please enter note' }]}
@@ -319,7 +330,10 @@ const AddProgram = () => {
                   name="category"
                   rules={[{ required: true, message: 'Please select a category' }]}
                 >
-                  <Radio.Group className="w-full">
+                  <Radio.Group 
+                    className="w-full"
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                  >
                     <Space direction="vertical" className="w-full">
                       {programCategories.map(cat => (
                         <Radio key={cat.value} value={cat.value}>
@@ -329,6 +343,41 @@ const AddProgram = () => {
                     </Space>
                   </Radio.Group>
                 </Form.Item>
+
+                {/* Other Category Name Fields - Only show when "Other" is selected */}
+                {selectedCategory === 'isOther' && (
+                  <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <Text strong className="block mb-3 text-gray-700">
+                      Other Category Details
+                    </Text>
+                    <Form.Item
+                      label="Other Category Name (English)"
+                      name="otherCategoryName"
+                      rules={[
+                        { required: true, message: 'Please enter other category name in English' },
+                        { min: 2, message: 'Name must be at least 2 characters' }
+                      ]}
+                    >
+                      <Input 
+                        placeholder="Enter category name in English" 
+                        className="h-10"
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      label="Other Category Name (Hindi)"
+                      name="otherCategoryHindiName"
+                      rules={[
+                        { required: true, message: 'Please enter other category name in Hindi' },
+                        { min: 2, message: 'Name must be at least 2 characters' }
+                      ]}
+                    >
+                      <Input 
+                        placeholder="हिंदी में श्रेणी का नाम दर्ज करें" 
+                        className="h-10"
+                      />
+                    </Form.Item>
+                  </div>
+                )}
               </Space>
             </Card>
 
@@ -389,6 +438,7 @@ const AddProgram = () => {
                 onClick={() => {
                   setIsDrawerOpen(false);
                   form.resetFields();
+                  setSelectedCategory(null);
                 }}
                 className="hover:bg-gray-50 px-6"
                 disabled={loading}

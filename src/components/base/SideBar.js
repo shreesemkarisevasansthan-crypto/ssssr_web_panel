@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -16,71 +18,60 @@ import {
   FiMail
 } from 'react-icons/fi';
 import { useAuth } from '@/lib/AuthProvider';
+import { useTranslations } from 'next-intl';
 
 const SideBar = ({ collapsed }) => {
   const pathname = usePathname();
   const { user } = useAuth();
+  const t = useTranslations('HomePage');
 
-
-  // Navigation items
+  // Navigation items with translations
   const navItems = [
     { 
       icon: <FiGrid size={20} />, 
-      label: 'Dashboard', 
+      label: t('dashboard'), 
       link: '/', 
-      description: 'Overview & analytics'
+      description: t('overviewAnalytics')
     },
     { 
       icon: <FiUsers size={20} />, 
-      label: 'Members', 
+      label: t('members'), 
       link: '/members', 
-      description: 'Manage members'
+      description: t('manageMembers')
     },
     { 
       icon: <FiUser size={20} />, 
-      label: 'Agents', 
+      label: t('agents'), 
       link: '/agents', 
-      description: 'Agent management'
+      description: t('agentManagement')
     },
     { 
       icon: <FiBell size={20} />, 
-      label: 'Yojna', 
+      label: t('yojna'), 
       link: '/yojna', 
-      description: 'Schemes & programs'
+      description: t('schemesPrograms')
     },
-       { 
-      icon: <FiCreditCard size={20} />, 
-      label: 'Closing Payments', 
-      link: '/closingPayments', 
-      description: 'Closing Payments '
-    },
-    // { 
-    //   icon: <FiBarChart2 size={20} />, 
-    //   label: 'Reports', 
-    //   link: '/reports', 
-    //   description: 'View reports'
-    // },
     { 
       icon: <FiCreditCard size={20} />, 
-      label: 'Payments', 
+      label: t('closingPayments'), 
+      link: '/closingPayments', 
+      description: t('closingPaymentsDesc')
+    },
+    { 
+      icon: <FiCreditCard size={20} />, 
+      label: t('payments'), 
       link: '/transactions', 
-      description: 'Payment history'
+      description: t('paymentHistory')
     },
   ];
 
   const systemItems = [
     { 
       icon: <FiSettings size={20} />, 
-      label: 'Settings', 
+      label: t('settings'), 
       link: '/setting', 
-      description: 'App configuration'
+      description: t('appConfiguration')
     },
-    // { 
-    //   icon: <FiHelpCircle size={20} />, 
-    //   label: 'Help & Support', 
-    //   link: '/support', 
-    //   description: 'Get help'
-    // },
   ];
 
   // Improved active link detection
@@ -119,9 +110,9 @@ const SideBar = ({ collapsed }) => {
           {!collapsed && (
             <div className="ml-4">
               <h2 className="font-bold text-xl text-gray-800">
-                Trust Manager
+                {t('title')}
               </h2>
-              <p className="text-xs text-gray-500 mt-1">Admin Panel</p>
+              <p className="text-xs text-gray-500 mt-1">{t('adminPanel')}</p>
             </div>
           )}
         </div>
@@ -132,7 +123,9 @@ const SideBar = ({ collapsed }) => {
         {/* Main Menu Section */}
         <div className="mb-8">
           <div className={`px-6 mb-4 ${collapsed ? 'hidden' : 'block'}`}>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Main Menu</p>
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              {t('mainMenu')}
+            </p>
           </div>
           
           <ul className="space-y-2 px-4">
@@ -176,7 +169,9 @@ const SideBar = ({ collapsed }) => {
         {/* System Section */}
         <div>
           <div className={`px-6 mb-4 ${collapsed ? 'hidden' : 'block'}`}>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">System</p>
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              {t('system')}
+            </p>
           </div>
           
           <ul className="space-y-2 px-4">
@@ -241,7 +236,7 @@ const SideBar = ({ collapsed }) => {
               </p>
               <div className="flex items-center mt-1">
                 <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-                <span className="text-xs text-gray-500">Online</span>
+                <span className="text-xs text-gray-500">{t('online')}</span>
               </div>
             </div>
           )}

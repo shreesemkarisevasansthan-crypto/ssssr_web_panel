@@ -434,7 +434,7 @@ const CertificateServerSide = ({data,selectedProgram,fontPath}) => (
                 <Text style={[styles.value, { minWidth: 160 }]}>{data?.guardian  || '---'}</Text>
               </View>
               <View style={styles.fieldGroup}>
-                <Text style={styles.label}>प्रत्येक {selectedProgram?.isSuraksha?'देहांत':selectedProgram?.isMamera?"मायरा":'विवाह'} पर सहयोग राशि:</Text>
+                <Text style={styles.label}>प्रत्येक {selectedProgram?.isSuraksha?'देहांत':selectedProgram?.isMamera?"मायरा":selectedProgram?.isOther?selectedProgram.otherCategoryHindiName:'विवाह'} पर सहयोग राशि:</Text>
                 <Text style={[styles.value, { minWidth: 70}]}>
                   {data?.payAmount || '0'}/-
                 </Text>

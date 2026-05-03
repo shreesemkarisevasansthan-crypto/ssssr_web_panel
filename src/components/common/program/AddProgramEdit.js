@@ -10,13 +10,14 @@ import { useDispatch, useSelector } from 'react-redux';
 const { TextArea } = Input;
 const { Title, Text } = Typography;
 
-const AddProgramEdit = ({ program, mode = 'add', onSuccess, triggerButton = null,isDrawerOpen,setIsDrawerOpen }) => {
+const AddProgramEdit = ({ program, mode = 'add', onSuccess, triggerButton = null, isDrawerOpen, setIsDrawerOpen }) => {
   const { message: antdMessage } = App.useApp();
   const [form] = Form.useForm();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [isSelected, setIsSelected] = useState(false);
-  const dispatch=useDispatch()
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const dispatch = useDispatch();
   const programList = useSelector((state) => state.data.programList);
 
   const locationGroupTypes = [
@@ -39,27 +40,31 @@ const AddProgramEdit = ({ program, mode = 'add', onSuccess, triggerButton = null
       setIsSelected(program.isSelected || false);
       
       // Determine selected category
-      let selectedCategory = 'isOther';
+      let selectedCategoryValue = 'isOther';
       programCategories.forEach(cat => {
         if (program[cat.value]) {
-          selectedCategory = cat.value;
+          selectedCategoryValue = cat.value;
         }
       });
+      setSelectedCategory(selectedCategoryValue);
 
       form.setFieldsValue({
         name: program.name,
         hiname: program.hiname,
         noteLine: program.noteLine || '',
         about: program.about,
-        memberCount:program?.memberCount ||  0,
-        inactivemembercount:program?.inactivemembercount || 0,
-        category: selectedCategory,
+        memberCount: program?.memberCount || 0,
+        inactivemembercount: program?.inactivemembercount || 0,
+        category: selectedCategoryValue,
+        otherCategoryName: program.otherCategoryName || '',
+        otherCategoryHindiName: program.otherCategoryHindiName || '',
         ageGroups: program.ageGroups || [],
         locationGroups: program.locationGroups || [],
       });
     } else if (mode === 'add' && isDrawerOpen) {
       // Reset form for add mode
       setIsSelected(false);
+      setSelectedCategory(null);
       form.resetFields();
     }
   }, [mode, program, isDrawerOpen, form]);
@@ -96,68 +101,55 @@ const AddProgramEdit = ({ program, mode = 'add', onSuccess, triggerButton = null
         categoryFlags[values.category] = true;
       }
 
+      // Base data object
+      const baseData = {
+        name: values.name,
+        hiname: values.hiname,
+        noteLine: values.noteLine || '',
+        about: values.about,
+        ...categoryFlags,
+        isSelected: isSelected,
+        memberCount: parseInt(values?.memberCount) || 0,
+        inactivemembercount: parseInt(values?.inactivemembercount) || 0,
+        ageGroups: ageGroupsWithId,
+        locationGroups: locationGroupsWithId,
+        updatedAt: new Date(),
+      };
+
+      // Add other category fields if category is "Other"
+      if (values.category === 'isOther') {
+        baseData.otherCategoryName = values.otherCategoryName || '';
+        baseData.otherCategoryHindiName = values.otherCategoryHindiName || '';
+      }
+
       if (mode === 'add') {
         const programsRef = collection(db, "users", user.uid, "programs");
         await addDoc(programsRef, {
-          name: values.name,
-          hiname: values.hiname,
-          noteLine: values.noteLine || '',
-          about: values.about,
-          ...categoryFlags,
-          isSelected: isSelected,
-          ageGroups: ageGroupsWithId,
-          memberCount:values?.memberCount,
-          inactivemembercount:values?.inactivemembercount,
-          locationGroups: locationGroupsWithId,
+          ...baseData,
           createdAt: new Date(),
-          updatedAt: new Date(),
           createdBy: user.uid,
         });
         
         antdMessage.success('Program created successfully!');
       } else if (mode === 'edit' && program?.id) {
         const programRef = doc(db, "users", user.uid, "programs", program.id);
-        await updateDoc(programRef, {
-          name: values.name,
-          hiname: values.hiname,
-          noteLine: values.noteLine || '',
-          about: values.about,
-          ...categoryFlags,
-          isSelected: isSelected,
-            memberCount:parseInt(values?.memberCount) || 0,
-          inactivemembercount:parseInt(values?.inactivemembercount) || 0,
-          ageGroups: ageGroupsWithId,
-          locationGroups: locationGroupsWithId,
-          updatedAt: new Date(),
-        });
+        await updateDoc(programRef, baseData);
         
         antdMessage.success('Program updated successfully!');
-          const programs=programList.map((item)=>{
-        if(item.id ===program.id){
-          return {
-            ...item,
-            memberCount:values?.memberCount,
-                 name: values.name,
-          hiname: values.hiname,
-          noteLine: values.noteLine || '',
-          about: values.about,
-          ...categoryFlags,
-          isSelected: isSelected,
-            memberCount:values?.memberCount,
-              inactivemembercount:values?.inactivemembercount,
-          ageGroups: ageGroupsWithId,
-          locationGroups: locationGroupsWithId,
-          updatedAt: new Date(),
+        
+        // Update Redux store
+        const updatedPrograms = programList.map((item) => {
+          if (item.id === program.id) {
+            return {
+              ...item,
+              ...baseData,
+              id: program.id,
+            };
           }
-        }else{
-          return item
-        }
-      })
-      dispatch(setPrograms(programs))
+          return item;
+        });
+        dispatch(setPrograms(updatedPrograms));
       }
-      
-    
- 
       
       // Call success callback if provided
       if (onSuccess) {
@@ -165,6 +157,7 @@ const AddProgramEdit = ({ program, mode = 'add', onSuccess, triggerButton = null
       }
       dispatch(setgetMemberDataChange(true));
       form.resetFields();
+      setSelectedCategory(null);
       setIsDrawerOpen(false);
     } catch (error) {
       console.error(`Error ${mode === 'add' ? 'adding' : 'updating'} program:`, error);
@@ -336,20 +329,14 @@ const AddProgramEdit = ({ program, mode = 'add', onSuccess, triggerButton = null
     </Card>
   );
 
-  const handleOpenDrawer = () => {
-    setIsDrawerOpen(true);
-  };
-
   const handleCloseDrawer = () => {
     setIsDrawerOpen(false);
     form.resetFields();
+    setSelectedCategory(null);
   };
 
   return (
     <>
-      {/* Custom trigger button or default button */}
-   
-
       <Drawer
         title={
           <div className="flex items-center gap-2">
@@ -364,7 +351,7 @@ const AddProgramEdit = ({ program, mode = 'add', onSuccess, triggerButton = null
         open={isDrawerOpen}
         width={600}
         className="custom-drawer"
-       destroyOnHidden
+        destroyOnHidden
       >
         <Form
           form={form}
@@ -400,7 +387,7 @@ const AddProgramEdit = ({ program, mode = 'add', onSuccess, triggerButton = null
                     className="h-10"
                   />
                 </Form.Item>
-                        <Form.Item
+                <Form.Item
                   label="Member Count"
                   name="memberCount"
                   rules={[{ required: false }]}
@@ -410,8 +397,8 @@ const AddProgramEdit = ({ program, mode = 'add', onSuccess, triggerButton = null
                     className="h-10"
                   />
                 </Form.Item>
-                        
-                        <Form.Item
+                
+                <Form.Item
                   label="InActive Member Count"
                   name="inactivemembercount"
                   rules={[{ required: false }]}
@@ -476,7 +463,10 @@ const AddProgramEdit = ({ program, mode = 'add', onSuccess, triggerButton = null
                   name="category"
                   rules={[{ required: true, message: 'Please select a category' }]}
                 >
-                  <Radio.Group className="w-full">
+                  <Radio.Group 
+                    className="w-full"
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                  >
                     <Space direction="vertical" className="w-full">
                       {programCategories.map(cat => (
                         <Radio key={cat.value} value={cat.value}>
@@ -486,6 +476,43 @@ const AddProgramEdit = ({ program, mode = 'add', onSuccess, triggerButton = null
                     </Space>
                   </Radio.Group>
                 </Form.Item>
+
+                {/* Other Category Name Fields - Only show when "Other" is selected */}
+                {selectedCategory === 'isOther' && (
+                  <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <Text strong className="block mb-3 text-blue-700">
+                      Other Category Details (Required)
+                    </Text>
+                    <Form.Item
+                      label="Other Category Name (English)"
+                      name="otherCategoryName"
+                      rules={[
+                        { required: true, message: 'Please enter other category name in English' },
+                        { min: 2, message: 'Name must be at least 2 characters' },
+                        { max: 50, message: 'Name cannot exceed 50 characters' }
+                      ]}
+                    >
+                      <Input 
+                        placeholder="Enter category name in English" 
+                        className="h-10"
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      label="Other Category Name (Hindi)"
+                      name="otherCategoryHindiName"
+                      rules={[
+                        { required: true, message: 'Please enter other category name in Hindi' },
+                        { min: 2, message: 'नाम कम से कम 2 अक्षर का होना चाहिए' },
+                        { max: 50, message: 'नाम 50 अक्षरों से अधिक नहीं हो सकता' }
+                      ]}
+                    >
+                      <Input 
+                        placeholder="हिंदी में श्रेणी का नाम दर्ज करें" 
+                        className="h-10"
+                      />
+                    </Form.Item>
+                  </div>
+                )}
               </Space>
             </Card>
 
