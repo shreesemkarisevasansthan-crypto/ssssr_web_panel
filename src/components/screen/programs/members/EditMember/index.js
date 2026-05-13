@@ -414,6 +414,7 @@ const handleDateOfBirthChange = (date) => {
         phoneAlt: values.phoneAlt || '',
         aadhaarNo: values.aadhaarNo,
         bobDate: values.bobDate.format('DD-MM-YYYY'),
+        dateJoin: values.dateJoin.format('DD-MM-YYYY'),
         currentAddress: values.currentAddress,
         village: values.village,
         state: values.state,
