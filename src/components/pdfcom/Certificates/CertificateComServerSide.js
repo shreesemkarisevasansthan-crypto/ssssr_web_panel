@@ -17,7 +17,6 @@ import { TrsutData } from '@/lib/constentData';
 import semkariLogo from '@/app/api/helperfile/Images/semkariLogo';
 import { pdfColors } from '../../../lib/constentData';
 
-
 // Register Devanagari Font
 Font.register({
   family: 'NotoSansDevanagari',
@@ -27,7 +26,7 @@ Font.register({
       fontWeight: 'normal',
     },
     {
-      src:NotoSansDevanagariBold,
+      src: NotoSansDevanagariBold,
       fontWeight: 'bold',
     },
   ],
@@ -35,7 +34,7 @@ Font.register({
 
 const styles = StyleSheet.create({
   page: {
-    backgroundColor:pdfColors.bgColor,
+    backgroundColor: pdfColors.bgColor,
     fontFamily: 'NotoSansDevanagari',
     padding: 12,
     width: '210mm',
@@ -74,11 +73,11 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     paddingHorizontal: 4,
   },
-logoImage: {
-  width: 68,
-  height: 68,
-  borderRadius: 4,
-},
+  logoImage: {
+    width: 68,
+    height: 68,
+    borderRadius: 4,
+  },
   logoImage1: {
     width: 90,
     height: 70,
@@ -157,7 +156,7 @@ logoImage: {
     paddingBottom: 2,
     paddingHorizontal: 5,
     minHeight: 16,
-    textTransform:'capitalize'
+    textTransform: 'capitalize'
   },
   memberIdBox: {
     position: 'absolute',
@@ -198,8 +197,6 @@ logoImage: {
   footerSection: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    // alignItems: 'flex-end',
-    // marginTop: 'auto',
     paddingHorizontal: 10,
     paddingTop: 8,
   },
@@ -216,7 +213,7 @@ logoImage: {
   footerLabel: {
     fontSize: 9,
     color: '#000',
-    marginTop:5,
+    marginTop: 5,
     fontWeight: 'bold',
   },
   footerValue: {
@@ -279,200 +276,213 @@ logoImage: {
     borderRadius: 3,
     marginLeft: 2,
   },
-  regCinText:{
+  regCinText: {
     fontSize: 7.8,
     color: '#333',
-     fontWeight: 'bold',
-     letterSpacing: 0.2,
-      marginBottom: 3,
+    fontWeight: 'bold',
+    letterSpacing: 0.2,
+    marginBottom: 3,
   }
 });
 
-const CertificateServerSide = ({data,selectedProgram,fontPath}) => (
-  <Document>
-    <Page size={{ width: '210mm', height: '148mm' }} style={styles.page}>
-      <View style={styles.outerBorder}>
-        <Text style={styles.serialNumber}>{data?.registrationNumber}</Text>
-        <View style={styles.innerBorder}>
-          {/* Top Text */}
-          <View style={styles.topText}>
+// Single Certificate Component
+const Certificate = ({ data, selectedProgram, index }) => (
+  <Page size={{ width: '210mm', height: '148mm' }} style={styles.page}>
+    <View style={styles.outerBorder}>
+      <Text style={styles.serialNumber}>{data?.registrationNumber}</Text>
+      <View style={styles.innerBorder}>
+        {/* Top Text */}
+        <View style={styles.topText}>
           {
-            TrsutData.topTitle.map((item,index)=>(
-              <Text key={index} style={styles.smallText}>{item}</Text>
+            TrsutData.topTitle.map((item, itemIndex) => (
+              <Text key={itemIndex} style={styles.smallText}>{item}</Text>
             ))
           }
-          </View> 
+        </View>
 
-          {/* Watermark */}
+        {/* Watermark */}
+        <Image 
+          src={TrsutData.logo}
+          style={styles.watermark}
+        />
+
+        {/* Header Section */}
+        <View style={styles.headerSection}>
+          {/* Left Logo — always show main logo as fallback */}
           <Image 
-           src={TrsutData.logo}
-            style={styles.watermark}
+            src={TrsutData.RightLogo || TrsutData.logo}
+            style={styles.logoImage1}
           />
 
-          {/* Header Section */}
-      <View style={styles.headerSection}>
-  
-  {/* Left Logo — always show main logo as fallback */}
-  <Image 
-    src={TrsutData.RightLogo || TrsutData.logo}
-    style={styles.logoImage1}
-  />
-
-  {/* Center Content */}
-  <View style={styles.centerContent}>
-    <Text style={styles.mainTitle}>{TrsutData.name}</Text>
-    {TrsutData.cityState && (
-      <Text style={styles.subTitle}>{TrsutData.cityState}</Text>
-    )}
-    {TrsutData.regNo && (
-      <Text style={styles.regCinText}>{TrsutData.regNo}</Text>
-    )}
-    {TrsutData.address && (
-      <Text style={styles.address}>{TrsutData.address}</Text>
-    )}
-    {TrsutData.contact && (
-      <Text style={styles.address}>{TrsutData.contact}</Text>
-    )}
-    <View style={styles.schemeBox}>
-      <Text style={styles.schemeText}>{selectedProgram?.hiname}</Text>
-    </View>
-  </View>
-
-  {/* Right Logo — show main logo, or blank placeholder if none */}
-  {TrsutData.RightLogo ? (
-    <Image src={TrsutData.logo} style={styles.logoImage} />
-  ) : (
-    <View style={styles.logoImage} />
-  )}
-
-</View>
-
-          {/* Member ID Box */}
-          <View style={styles.memberIdBox}>
-            {data?.photoURL ? (
-              <Image src={data.photoURL} style={styles.photoImage} />
-            ) : (
-              <View>
-                <Text style={styles.memberIdLabel}>सदस्य फोटो</Text>
-              </View>
+          {/* Center Content */}
+          <View style={styles.centerContent}>
+            <Text style={styles.mainTitle}>{TrsutData.name}</Text>
+            {TrsutData.cityState && (
+              <Text style={styles.subTitle}>{TrsutData.cityState}</Text>
             )}
-          </View>
-
-          {/* Form Section */}
-          <View style={styles.formSection}>
-            {/* Row 1 */}
-            <View style={[styles.row,{
-              justifyContent:'space-between',
-              marginRight:55
-            }]}>
-              <View style={styles.fieldGroup}>
-                <Text style={styles.label}>सदस्यता क्रमांक:</Text>
-                <Text style={[styles.value, { minWidth: 90 }]}>{data?.registrationNumber || '---'}</Text>
-              </View>
-              <View style={[styles.fieldGroup, { marginLeft: 20,marginRight:40 }]}>
-                <Text style={styles.label}>दिनांक:</Text>
-                <Text style={[styles.value, { minWidth: 60 }]}>{data?.dateJoin || '---'}</Text>
-              </View>
-            </View>
-
-            {/* Row 2 */}
-            <View style={styles.row}>
-              <View style={styles.fieldGroup}>
-                <Text style={styles.label}>नाम:</Text>
-                <Text style={[styles.value, { minWidth: 150 }]}>{data?.displayName || '---'}</Text>
-              </View>
-              <View style={styles.fieldGroup}>
-                <Text style={styles.label}>पिता/पति का नाम:</Text>
-                <Text style={[styles.value, { minWidth: 150 }]}>{data?.fatherName || '---'}</Text>
-              </View>
-            </View>
-
-            {/* Row 3 */}
-            <View style={styles.row}>
-              <View style={styles.fieldGroup}>
-                <Text style={styles.label}>गोत्र:</Text>
-                <Text style={[styles.value, { minWidth: 90 }]}>{data?.gotra || '---'}</Text>
-              </View>
-              <View style={styles.fieldGroup}>
-                <Text style={styles.label}>जाति:</Text>
-                <Text style={[styles.value, { minWidth:100}]}>{data?.jati || '---'}</Text>
-              </View>
-              <View style={styles.fieldGroup}>
-                <Text style={styles.label}>जन्म दि.:</Text>
-                <Text style={[styles.value, { minWidth: 110 }]}>{data?.bobDate || '---'}</Text>
-              </View>
-            </View>
-
-            {/* Row 4 */}
-            <View style={styles.row}>
-              <View style={styles.fieldGroup}>
-                <Text style={styles.label}>मोबाईल नंबर:</Text>
-                <Text style={[styles.value, { minWidth: 140 }]}>{data?.phone || '---'}</Text>
-              </View>
-              <View style={styles.fieldGroup}>
-                <Text style={styles.label}>गाँव/शहर का नाम:</Text>
-                <Text style={[styles.value, { minWidth: 135 }]}>{data?.village || '---'}</Text>
-              </View>
-            </View>
-
-            {/* Row 5 */}
-            <View style={styles.row}>
-              <View style={styles.fieldGroup}>
-                <Text style={styles.label}>जिला:</Text>
-                <Text style={[styles.value, { minWidth: 160 }]}>{data?.district || '---'}</Text>
-              </View>
-              <View style={styles.fieldGroup}>
-                <Text style={styles.label}>राज्य:</Text>
-                <Text style={[styles.value, { minWidth: 180 }]}>{data?.state || '---'}</Text>
-              </View>
-            </View>
-
-            {/* Row 6 */}
-            <View style={styles.row}>
-                  <View style={styles.fieldGroup}>
-                <Text style={styles.label}>वारिसदार:</Text>
-                <Text style={[styles.value, { minWidth: 160 }]}>{data?.guardian  || '---'}</Text>
-              </View>
-              <View style={styles.fieldGroup}>
-                <Text style={styles.label}>प्रत्येक {selectedProgram?.isSuraksha?'देहांत':selectedProgram?.isMamera?"मायरा":selectedProgram?.isOther?selectedProgram.otherCategoryHindiName:'विवाह'} पर सहयोग राशि:</Text>
-                <Text style={[styles.value, { minWidth: 70}]}>
-                  {data?.payAmount || '0'}/-
-                </Text>
-                <Text style={styles.label}>रुपये</Text>
-              </View>
+            {TrsutData.regNo && (
+              <Text style={styles.regCinText}>{TrsutData.regNo}</Text>
+            )}
+            {TrsutData.address && (
+              <Text style={styles.address}>{TrsutData.address}</Text>
+            )}
+            {TrsutData.contact && (
+              <Text style={styles.address}>{TrsutData.contact}</Text>
+            )}
+            <View style={styles.schemeBox}>
+              <Text style={styles.schemeText}>{selectedProgram?.hiname}</Text>
             </View>
           </View>
 
-          {/* Details Section */}
-          {
-            selectedProgram?.noteLine && <View style={styles.detailsSection}>
-            <Text style={{
-            }}>
-             {selectedProgram?.noteLine}
-            </Text>
-          </View>
-          }
-       
+          {/* Right Logo — show main logo, or blank placeholder if none */}
+          {TrsutData.RightLogo ? (
+            <Image src={TrsutData.logo} style={styles.logoImage} />
+          ) : (
+            <View style={styles.logoImage} />
+          )}
+        </View>
 
-          {/* Footer Section */}
-          <View style={styles.footerSection}>
-            {/* Left Side - Karyakarta */}
-            <View style={styles.leftFooter}>
-              <Text style={styles.footerValue}>{data?.addedByName || '---'} ({data.agentPhone})</Text>
-              <Text style={styles.footerLabel}>कार्यकर्ता </Text>
+        {/* Member ID Box */}
+        <View style={styles.memberIdBox}>
+          {data?.photoURL ? (
+            <Image src={data.photoURL} style={styles.photoImage} />
+          ) : (
+            <View>
+              <Text style={styles.memberIdLabel}>सदस्य फोटो</Text>
             </View>
+          )}
+        </View>
 
-            {/* Right Side - Signature */}
-            <View style={styles.rightFooter}>
-              <Text style={styles.footerValue}>{TrsutData.trustPresident || '---'}</Text>
-              <Text style={styles.footerLabel}>संस्थापक</Text>
-              {/* <Text style={styles.signatureText}>हस्ताक्षर</Text> */}
+        {/* Form Section */}
+        <View style={styles.formSection}>
+          {/* Row 1 */}
+          <View style={[styles.row, {
+            justifyContent: 'space-between',
+            marginRight: 55
+          }]}>
+            <View style={styles.fieldGroup}>
+              <Text style={styles.label}>सदस्यता क्रमांक:</Text>
+              <Text style={[styles.value, { minWidth: 90 }]}>{data?.registrationNumber || '---'}</Text>
+            </View>
+            <View style={[styles.fieldGroup, { marginLeft: 20, marginRight: 40 }]}>
+              <Text style={styles.label}>दिनांक:</Text>
+              <Text style={[styles.value, { minWidth: 60 }]}>{data?.dateJoin || '---'}</Text>
+            </View>
+          </View>
+
+          {/* Row 2 */}
+          <View style={styles.row}>
+            <View style={styles.fieldGroup}>
+              <Text style={styles.label}>नाम:</Text>
+              <Text style={[styles.value, { minWidth: 150 }]}>{data?.displayName || '---'}</Text>
+            </View>
+            <View style={styles.fieldGroup}>
+              <Text style={styles.label}>पिता/पति का नाम:</Text>
+              <Text style={[styles.value, { minWidth: 150 }]}>{data?.fatherName || '---'}</Text>
+            </View>
+          </View>
+
+          {/* Row 3 */}
+          <View style={styles.row}>
+            <View style={styles.fieldGroup}>
+              <Text style={styles.label}>गोत्र:</Text>
+              <Text style={[styles.value, { minWidth: 90 }]}>{data?.gotra || '---'}</Text>
+            </View>
+            <View style={styles.fieldGroup}>
+              <Text style={styles.label}>जाति:</Text>
+              <Text style={[styles.value, { minWidth: 100 }]}>{data?.jati || '---'}</Text>
+            </View>
+            <View style={styles.fieldGroup}>
+              <Text style={styles.label}>जन्म दि.:</Text>
+              <Text style={[styles.value, { minWidth: 110 }]}>{data?.bobDate || '---'}</Text>
+            </View>
+          </View>
+
+          {/* Row 4 */}
+          <View style={styles.row}>
+            <View style={styles.fieldGroup}>
+              <Text style={styles.label}>मोबाईल नंबर:</Text>
+              <Text style={[styles.value, { minWidth: 140 }]}>{data?.phone || '---'}</Text>
+            </View>
+            <View style={styles.fieldGroup}>
+              <Text style={styles.label}>गाँव/शहर का नाम:</Text>
+              <Text style={[styles.value, { minWidth: 135 }]}>{data?.village || '---'}</Text>
+            </View>
+          </View>
+
+          {/* Row 5 */}
+          <View style={styles.row}>
+            <View style={styles.fieldGroup}>
+              <Text style={styles.label}>जिला:</Text>
+              <Text style={[styles.value, { minWidth: 160 }]}>{data?.district || '---'}</Text>
+            </View>
+            <View style={styles.fieldGroup}>
+              <Text style={styles.label}>राज्य:</Text>
+              <Text style={[styles.value, { minWidth: 180 }]}>{data?.state || '---'}</Text>
+            </View>
+          </View>
+
+          {/* Row 6 */}
+          <View style={styles.row}>
+            <View style={styles.fieldGroup}>
+              <Text style={styles.label}>वारिसदार:</Text>
+              <Text style={[styles.value, { minWidth: 160 }]}>{data?.guardian || '---'}</Text>
+            </View>
+            <View style={styles.fieldGroup}>
+              <Text style={styles.label}>प्रत्येक {selectedProgram?.isSuraksha ? 'देहांत' : selectedProgram?.isMamera ? "मायरा" : selectedProgram?.isOther ? selectedProgram.otherCategoryHindiName : 'विवाह'} पर सहयोग राशि:</Text>
+              <Text style={[styles.value, { minWidth: 70 }]}>
+                {data?.payAmount || '0'}/-
+              </Text>
+              <Text style={styles.label}>रुपये</Text>
             </View>
           </View>
         </View>
+
+        {/* Details Section */}
+        {
+          selectedProgram?.noteLine && <View style={styles.detailsSection}>
+            <Text style={{}}>
+              {selectedProgram?.noteLine}
+            </Text>
+          </View>
+        }
+
+        {/* Footer Section */}
+        <View style={styles.footerSection}>
+          {/* Left Side - Karyakarta */}
+          <View style={styles.leftFooter}>
+            <Text style={styles.footerValue}>{data?.addedByName || '---'} ({data?.agentPhone || '---'})</Text>
+            <Text style={styles.footerLabel}>कार्यकर्ता</Text>
+          </View>
+
+          {/* Right Side - Signature */}
+          <View style={styles.rightFooter}>
+            <Text style={styles.footerValue}>{TrsutData.trustPresident || '---'}</Text>
+            <Text style={styles.footerLabel}>संस्थापक</Text>
+          </View>
+        </View>
       </View>
-    </Page>
-  </Document>
+    </View>
+  </Page>
 );
+
+// Main Component - Handles both single and multiple members
+const CertificateServerSide = ({ data, selectedProgram, fontPath }) => {
+  // Convert single data to array if needed
+  const membersArray = Array.isArray(data) ? data : [data];
+  
+  return (
+    <Document>
+      {membersArray.map((member, index) => (
+        <Certificate 
+          key={member?.id || member?.registrationNumber || index}
+          data={member}
+          selectedProgram={selectedProgram}
+          index={index}
+        />
+      ))}
+    </Document>
+  );
+};
 
 export default CertificateServerSide;
