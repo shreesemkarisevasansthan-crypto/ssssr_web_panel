@@ -967,7 +967,7 @@ const AddMember = () => {
                         style={{ width: '100%' }}
                         format="DD-MM-YYYY"
                         prefix={<CalendarOutlined />}
-                        disabledDate={(current) => current && current > dayjs()}
+                    
                         onChange={handleJoinDateChange}
                       />
                     </Form.Item>
