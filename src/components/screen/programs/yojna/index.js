@@ -19,6 +19,7 @@ import {
 import { useSelector, useDispatch } from 'react-redux';
 import AddProgramEdit from '@/components/common/program/AddProgramEdit';
 import { deleteProgram, updateProgram } from '@/lib/services/firebaseService';
+import AddProgram from '@/components/common/program';
 
 const { Panel } = Collapse;
 const { Meta } = Card;
@@ -327,6 +328,7 @@ const Programs = () => {
                 className="shadow-sm"
               />
               <AddProgramEdit />
+        <AddProgram />
             </div>
           </div>
           {searchText && (
